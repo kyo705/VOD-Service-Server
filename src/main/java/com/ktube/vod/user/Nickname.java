@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = NicknameValidator.class)
 public @interface Nickname {
 
-    String message() default "nickname must not contains special characters";
+    String message() default "nickname must not contains special characters except with space";
     Class[] groups() default {};
     Class[] payload() default {};
 }

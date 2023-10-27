@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = PasswordValidator.class)
 public @interface Password {
 
-    String message() default "password must contain special character and number and upper and lowercase character at least once";
+    String message() default "password must contain special character and number and character at least once";
     Class[] groups() default {};
     Class[] payload() default {};
 }
