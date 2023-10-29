@@ -18,7 +18,7 @@ public class UserController {
     @PostMapping(USER_URL)
     public ResponseUserJoinDto join(@RequestBody @Valid RequestUserJoinDto requestBody) {
 
-        User joinedUser = userService.join(requestBody);
+        KTubeUser joinedUser = userService.join(requestBody);
 
         return ResponseUserJoinDto
                 .builder()

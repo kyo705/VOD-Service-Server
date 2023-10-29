@@ -39,14 +39,14 @@ public class UserServiceTest {
         given(userRepository.findByEmail(any())).willReturn(null);
 
         //when
-        User resultUser = userService.join(request);
+        KTubeUser resultKTubeUser = userService.join(request);
 
         //then
         verify(userRepository, times(1)).create(any());
-        assertThat(resultUser.getEmail()).isEqualTo(request.getEmail());
-        assertThat(PasswordEncoderUtils.match(request.getPassword(), resultUser.getPassword())).isTrue();
-        assertThat(resultUser.getNickname()).isEqualTo(request.getNickname());
-        assertThat(resultUser.getRole()).isEqualTo(UserRole.TEMPORARY);
+        assertThat(resultKTubeUser.getEmail()).isEqualTo(request.getEmail());
+        assertThat(PasswordEncoderUtils.match(request.getPassword(), resultKTubeUser.getPassword())).isTrue();
+        assertThat(resultKTubeUser.getNickname()).isEqualTo(request.getNickname());
+        assertThat(resultKTubeUser.getRole()).isEqualTo(UserRole.TEMPORARY);
     }
 
     @DisplayName("이미 존재하는 이메일로 회원가입 요청시 예외가 발생한다.")

@@ -14,7 +14,7 @@ public class UserService {
     private final UserRepository userRepository;
 
     @Transactional
-    public User join(RequestUserJoinDto requestBody) {
+    public KTubeUser join(RequestUserJoinDto requestBody) {
 
         String email = requestBody.getEmail();
         String password = PasswordEncoderUtils.encodePassword(requestBody.getPassword());
@@ -23,7 +23,7 @@ public class UserService {
         if(userRepository.findByEmail(email) != null) {
             throw new IllegalArgumentException(ALREADY_EXISTING_EMAIL_MESSAGE);
         }
-        User user = User.init(email, password, nickname);
+        KTubeUser user = KTubeUser.init(email, password, nickname);
         userRepository.create(user);
 
         return user;
@@ -32,7 +32,7 @@ public class UserService {
     @Transactional
     public void registerIdentifiedUser(String email) {
 
-        User user = userRepository.findByEmail(email);
+        KTubeUser user = userRepository.findByEmail(email);
         if(user == null) {
             throw new IllegalArgumentException(NOT_EXISTING_EMAIL_MESSAGE);
         }

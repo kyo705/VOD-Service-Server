@@ -2,10 +2,10 @@ package com.ktube.vod.user;
 
 public interface UserRepository {
 
-    void create(User user);
-    User findById(Long id);
-    User findByEmail(String email);
-    User update(User user);
-    User delete(Long id);
+    void create(KTubeUser user);
+    KTubeUser findById(Long id);
+    KTubeUser findByEmail(String email);
+    KTubeUser update(KTubeUser user);
+    KTubeUser delete(Long id);
 
 }
