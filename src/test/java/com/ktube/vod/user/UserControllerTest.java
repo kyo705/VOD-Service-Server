@@ -3,7 +3,9 @@ package com.ktube.vod.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ktube.vod.config.TestSecurityConfig;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
@@ -28,6 +30,7 @@ public class UserControllerTest {
     @MockBean private UserService mockUserService;
 
     @DisplayName("잘못된 이메일로 회원가입 요청 시 400 상태코드를 리턴한다.")
+    @EmptySource
     @ValueSource(strings = {"email", "email@", "email@naver,com", "email@naver.com.", "email[@naver.com"})
     @ParameterizedTest
     public void testUserJoinWithInvalidEmail(String invalidEmail) throws Exception {
@@ -50,6 +53,7 @@ public class UserControllerTest {
     }
 
     @DisplayName("잘못된 비밀번호로 회원가입 요청 시 400 상태코드를 리턴한다.")
+    @EmptySource
     @ValueSource(
             strings = {"1234567890!" /* 문자 x */
                     , "aaaasdgsdgsgw!!" /* 숫자 x */
@@ -68,8 +72,6 @@ public class UserControllerTest {
         requestBody.setPassword(invalidPassword);
         requestBody.setNickname("닉네임");
 
-        BDDMockito.given(mockUserService.join(ArgumentMatchers.any())).willReturn(new User());
-
         //when & then
         mockMvc.perform(
                         MockMvcRequestBuilders
@@ -82,8 +84,8 @@ public class UserControllerTest {
     }
 
     @DisplayName("잘못된 닉네임으로 회원가입 요청 시 400 상태코드를 리턴한다.")
-    @ValueSource(
-            strings = {"~닉네임", "닉~네임", "닉네~임", "닉네임~"})
+    @EmptySource
+    @ValueSource(strings = {"~닉네임", "닉~네임", "닉네~임", "닉네임~"})
     @ParameterizedTest
     public void testUserJoinWithInvalidNickname(String invalidNickname) throws Exception {
 
@@ -93,7 +95,29 @@ public class UserControllerTest {
         requestBody.setPassword("1234567890a!");
         requestBody.setNickname(invalidNickname);
 
-        BDDMockito.given(mockUserService.join(ArgumentMatchers.any())).willReturn(new User());
+        //when & then
+        mockMvc.perform(
+                        MockMvcRequestBuilders
+                                .post(UserConstants.USER_URL)
+                                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                                .characterEncoding(StandardCharsets.UTF_8)
+                                .content(objectMapper.writeValueAsString(requestBody))
+                )
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @DisplayName("이미 가입되어 있는 이메일로 회원 가입 요청시 400 상태코드를 리턴한다.")
+    @Test
+    public void testJoinWithAlreadyJoinedEmail() throws Exception {
+
+        //given
+        RequestUserJoinDto requestBody = new RequestUserJoinDto();
+        requestBody.setEmail("alreadyJoinedEmail@naver.com");
+        requestBody.setPassword("1234567890a!");
+        requestBody.setNickname("닉네임");
+
+        BDDMockito.given(mockUserService.join(ArgumentMatchers.any()))
+                .willThrow(new IllegalArgumentException("이미 존재하는 이메일 계정입니다."));
 
         //when & then
         mockMvc.perform(
