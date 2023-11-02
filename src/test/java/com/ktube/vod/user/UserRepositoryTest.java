@@ -29,7 +29,7 @@ public class UserRepositoryTest {
     public void testCreatingUser() {
 
         //given
-        KTubeUser user = KTubeUser.init("email@naver.com", "password1234!", "닉네임");
+        KTubeUser user = KTubeUser.init("notExistingEmail@naver.com", "password1234!", "닉네임");
 
         assertThat(user.getId()).isNull();
 
@@ -45,13 +45,11 @@ public class UserRepositoryTest {
     public void testFindingUserByEmailWithDuplicatedEmail() {
 
         //given
-        KTubeUser user1 = KTubeUser.init("email@naver.com", "password1234!", "닉네임1");
-        KTubeUser user2 = KTubeUser.init("email@naver.com", "password4321!", "닉네임2");
+        KTubeUser user = KTubeUser.init("email@naver.com", "password1234!", "닉네임1");
 
         //when & then
         try {
-            userRepository.create(user1);
-            userRepository.create(user2);
+            userRepository.create(user);
 
             em.flush();
             em.clear();
@@ -66,10 +64,12 @@ public class UserRepositoryTest {
     public void testFindingUserByIdWithExistingUserId() {
 
         //given
-        KTubeUser user = KTubeUser.init("email@naver.com", "password1234!", "닉네임");
-        em.persist(user);
-        em.flush();
-        em.clear();
+        KTubeUser user = new KTubeUser();
+        user.setId(1L);
+        user.setEmail("email@naver.com");
+        user.setPassword("$2a$10$T.aFIqEh8NA3QahFugycAu/IZWUXoAihFYYsWwulBZRRkxAg6zUy6");
+        user.setNickname("hi");
+        user.setRole(UserRole.TEMPORARY);
 
         //when
         KTubeUser resultUser = userRepository.findById(user.getId());
@@ -87,7 +87,7 @@ public class UserRepositoryTest {
     public void testFindingUserByIdWithNotExistingUserId() {
 
         //given
-        Long userId = 1L;
+        Long userId = 5L;
 
         //when
         KTubeUser resultKTubeUser = userRepository.findById(userId);
@@ -101,10 +101,12 @@ public class UserRepositoryTest {
     public void testFindingUserByEmailWithExistingEmail() {
 
         //given
-        KTubeUser user = KTubeUser.init("email@naver.com", "password1234!", "닉네임");
-        em.persist(user);
-        em.flush();
-        em.clear();
+        KTubeUser user = new KTubeUser();
+        user.setId(1L);
+        user.setEmail("email@naver.com");
+        user.setPassword("$2a$10$T.aFIqEh8NA3QahFugycAu/IZWUXoAihFYYsWwulBZRRkxAg6zUy6");
+        user.setNickname("hi");
+        user.setRole(UserRole.TEMPORARY);
 
         //when
         KTubeUser resultUser = userRepository.findByEmail(user.getEmail());
