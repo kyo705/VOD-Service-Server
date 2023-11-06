@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 @Table(name = "ktube_user", indexes = @Index(unique = true, name = "ktube_user_idx_email", columnList = "email"))
 public class KTubeUser {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotNull
     private String email;
