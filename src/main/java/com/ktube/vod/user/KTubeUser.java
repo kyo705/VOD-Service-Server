@@ -1,7 +1,8 @@
 package com.ktube.vod.user;
 
 import com.ktube.vod.identification.AlreadyIdentifiedUserException;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;

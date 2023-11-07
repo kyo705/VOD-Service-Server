@@ -28,6 +28,7 @@ dependencies {
 	implementation 'org.springframework.session:spring-session-core'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'com.auth0:java-jwt:4.4.0'
+	runtimeOnly 'mysql:mysql-connector-java:8.0.32'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
