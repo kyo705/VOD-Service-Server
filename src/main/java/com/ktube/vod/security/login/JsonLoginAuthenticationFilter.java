@@ -28,6 +28,11 @@ public class JsonLoginAuthenticationFilter extends UsernamePasswordAuthenticatio
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
+        // 로그인 요청이 아닐 경우 다음 필터로 넘어감
+        if (!requiresAuthentication((HttpServletRequest) request, (HttpServletResponse) response)) {
+            chain.doFilter(request, response);
+            return;
+        }
         //세션 정보가 이미 존재하는 경우
         if(SecurityContextHolder.getContext().getAuthentication() != null) {
             writeResponse((HttpServletResponse) response, HttpStatus.FORBIDDEN.value(), "이미 세션을 갖고 있는 클라이언트 입니다.");
