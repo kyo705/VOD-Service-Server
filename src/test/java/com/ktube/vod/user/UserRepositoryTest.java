@@ -67,7 +67,7 @@ public class UserRepositoryTest {
         KTubeUser user = new KTubeUser();
         user.setId(1L);
         user.setEmail("email@naver.com");
-        user.setPassword("$2a$10$T.aFIqEh8NA3QahFugycAu/IZWUXoAihFYYsWwulBZRRkxAg6zUy6");
+        user.setPassword("123456789!d");
         user.setNickname("hi");
         user.setRole(UserRole.TEMPORARY);
 
@@ -77,7 +77,7 @@ public class UserRepositoryTest {
         //then
         assertThat(resultUser.getId()).isEqualTo(user.getId());
         assertThat(resultUser.getEmail()).isEqualTo(user.getEmail());
-        assertThat(resultUser.getPassword()).isEqualTo(user.getPassword());
+        assertThat(PasswordEncoderUtils.match(user.getPassword(),resultUser.getPassword())).isTrue();
         assertThat(resultUser.getNickname()).isEqualTo(user.getNickname());
         assertThat(resultUser.getRole()).isEqualTo(user.getRole());
     }
@@ -104,7 +104,7 @@ public class UserRepositoryTest {
         KTubeUser user = new KTubeUser();
         user.setId(1L);
         user.setEmail("email@naver.com");
-        user.setPassword("$2a$10$T.aFIqEh8NA3QahFugycAu/IZWUXoAihFYYsWwulBZRRkxAg6zUy6");
+        user.setPassword("123456789!d");
         user.setNickname("hi");
         user.setRole(UserRole.TEMPORARY);
 
@@ -114,7 +114,7 @@ public class UserRepositoryTest {
         //then
         assertThat(resultUser.getId()).isEqualTo(user.getId());
         assertThat(resultUser.getEmail()).isEqualTo(user.getEmail());
-        assertThat(resultUser.getPassword()).isEqualTo(user.getPassword());
+        assertThat(PasswordEncoderUtils.match(user.getPassword(),resultUser.getPassword())).isTrue();
         assertThat(resultUser.getNickname()).isEqualTo(user.getNickname());
         assertThat(resultUser.getRole()).isEqualTo(user.getRole());
     }
