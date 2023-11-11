@@ -6,6 +6,7 @@ public class UserConstants {
     public static final String PASSWORD_REGEX = "^(?=.*[ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z])(?=.*\\d)(?=.*[!~<>,;:_=?*+#.\"'&§%°()\\|\\[\\]\\-\\$\\^\\@\\/])[ㄱ-ㅎㅏ-ㅣ가-힣A-Za-z\\d!~<>,;:_=?*+#.\"'&§%°()\\|\\[\\]\\-\\$\\^\\@\\/]{11,30}$";
     public static final String NICKNAME_REGEX = "[ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z\\d\\s]{1,20}$";
     public static final String USER_URL = "/api/user";
+    public static final String USER_IDENTIFICATION_URL = "/api/user/identification";
 
     // 메세지
     public static final String ALREADY_EXISTING_EMAIL_MESSAGE = "이미 존재하는 이메일 계정입니다.";

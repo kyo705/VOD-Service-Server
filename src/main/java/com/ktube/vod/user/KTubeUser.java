@@ -1,6 +1,5 @@
 package com.ktube.vod.user;
 
-import com.ktube.vod.identification.AlreadyIdentifiedUserException;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,13 +33,5 @@ public class KTubeUser {
         KTubeUser.setRole(UserRole.TEMPORARY);
 
         return KTubeUser;
-    }
-
-    public void identified() {
-
-        if(this.role != UserRole.TEMPORARY) {
-            throw new AlreadyIdentifiedUserException(this.email);
-        }
-        this.role = UserRole.GENERAL;
     }
 }
