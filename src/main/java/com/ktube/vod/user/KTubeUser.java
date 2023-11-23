@@ -5,6 +5,8 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 @Setter
 @Getter
@@ -12,17 +14,29 @@ import javax.validation.constraints.NotNull;
 @Table(name = "ktube_user", indexes = @Index(unique = true, name = "ktube_user_idx_email", columnList = "email"))
 public class KTubeUser {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @NotNull
     private String email;
+
     @NotNull
     private String password;
+
     @NotNull
     private String nickname;
+
     @Convert(converter = UserRoleConverter.class)
     @NotNull
     private UserRole role;
+
+    @Convert(converter = UserSecurityLevelConverter.class)
+    @NotNull
+    private UserSecurityLevel securityLevel;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<UserDevice> devices = new ArrayList<>();
 
     public static KTubeUser init(String email, String password, String nickname) {
 
@@ -30,8 +44,15 @@ public class KTubeUser {
         KTubeUser.setEmail(email);
         KTubeUser.setPassword(password);
         KTubeUser.setNickname(nickname);
-        KTubeUser.setRole(UserRole.TEMPORARY);
+        KTubeUser.setRole(UserRole.GENERAL);
+        KTubeUser.setSecurityLevel(UserSecurityLevel.GENERAL);
 
         return KTubeUser;
+    }
+
+    public void registerClientDeviceInfo(String clientDeviceInfo) {
+
+        UserDevice userDevice = UserDevice.init(this, clientDeviceInfo);
+        devices.add(userDevice);
     }
 }

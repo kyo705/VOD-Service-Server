@@ -9,4 +9,6 @@ public class RequestLoginDto {
 
     private String email;
     private String password;
+    private boolean temporary;
+    private String clientDeviceInfo;
 }

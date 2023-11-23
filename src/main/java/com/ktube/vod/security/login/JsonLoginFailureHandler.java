@@ -22,11 +22,24 @@ public class JsonLoginFailureHandler implements AuthenticationFailureHandler {
         String failureMessage = exception.getMessage();
         log.error(failureMessage);
 
-        ResponseLoginDto responseBody = new ResponseLoginDto();
-        responseBody.setCode(HttpStatus.BAD_REQUEST.value());
-        responseBody.setMessage(failureMessage);
+        if(exception instanceof NotYetAuthorizedException) {
+            writeResponse(response, HttpStatus.FORBIDDEN.value(), failureMessage);
+            return;
+        }
+        if(exception instanceof NotAllowedDeviceException) {
+            writeResponse(response, HttpStatus.UNAUTHORIZED.value(), failureMessage);
+            return;
+        }
+        writeResponse(response, HttpStatus.BAD_REQUEST.value(), failureMessage);
+    }
 
-        response.setStatus(HttpStatus.BAD_REQUEST.value());
+    private void writeResponse(HttpServletResponse response, int statusCode, String message) throws IOException {
+
+        ResponseLoginDto responseBody = new ResponseLoginDto();
+        responseBody.setCode(statusCode);
+        responseBody.setMessage(message);
+
+        response.setStatus(statusCode);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter().write(objectMapper.writeValueAsString(responseBody));
     }

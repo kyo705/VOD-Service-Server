@@ -1,5 +1,6 @@
 package com.ktube.vod.config;
 
+import com.ktube.vod.notification.NotificationService;
 import com.ktube.vod.security.authority.JsonAccessDeniedHandler;
 import com.ktube.vod.security.authority.JsonHttp403ForbiddenEntryPoint;
 import com.ktube.vod.security.login.JsonLoginConfigurer;
@@ -22,7 +23,7 @@ import static org.springframework.http.HttpMethod.POST;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, NotificationService emailNotificationService) throws Exception {
 
         //엔드 포인트 권한 설정
         http.authorizeHttpRequests()
@@ -37,7 +38,7 @@ public class SecurityConfig {
         //로그인 설정
         http.apply(new JsonLoginConfigurer<>())
                 .loginProcessingUrl(LOGIN_URL)
-                .successHandler(new JsonLoginSuccessHandler())
+                .successHandler(new JsonLoginSuccessHandler(emailNotificationService))
                 .failureHandler(new JsonLoginFailureHandler());
 
         //로그아웃 설정

@@ -61,7 +61,7 @@ public class LoginIntegrationTest {
                 });
     }
 
-    @DisplayName("인증이 완료되지 않은 유저로 로그인 시도할 경우 401 상태코드를 리턴한다.")
+    @DisplayName("허용되지 않은 디바이스에서 로그인 시도할 경우 401 상태코드를 리턴한다.")
     @MethodSource("com.ktube.vod.security.login.LoginSetup#getLoginDtoWithUnauthorizedUser")
     @ParameterizedTest
     public void testLoginWithUnauthorizedUserInfo(RequestLoginDto requestBody) throws Exception {
@@ -79,8 +79,26 @@ public class LoginIntegrationTest {
                 });
     }
 
+    @DisplayName("인증이 완료되지 않은 유저로 로그인 시도할 경우 401 상태코드를 리턴한다.")
+    @MethodSource("com.ktube.vod.security.login.LoginSetup#getLoginDtoWithUserRequiredToIdentity")
+    @ParameterizedTest
+    public void testLoginWithUserInfoRequiredToIdentity(RequestLoginDto requestBody) throws Exception {
+
+        //when & then
+        mockMvc.perform(
+                        MockMvcRequestBuilders.post(LOGIN_URL)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(requestBody))
+                )
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN.value()))
+                .andExpect(result -> {
+                    ResponseLoginDto responseBody = objectMapper.readValue(result.getResponse().getContentAsString(), ResponseLoginDto.class);
+                    assertThat(responseBody.getCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
+                });
+    }
+
     @WithUserDetails("email@naver.com")
-    @DisplayName("기존 세션이 있으면서 로그인 시도할 경우 400 상태코드를 리턴한다.")
+    @DisplayName("기존 세션이 있으면서 로그인 시도할 경우 409 상태코드를 리턴한다.")
     @MethodSource("com.ktube.vod.security.login.LoginSetup#getLoginDtoWithAuthorizedUser")
     @ParameterizedTest
     public void testLoginWithAlreadyExistingSession(RequestLoginDto requestBody) throws Exception {
@@ -91,11 +109,11 @@ public class LoginIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(requestBody))
                 )
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN.value()))
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.CONFLICT.value()))
                 .andExpect(result -> {
                     System.out.println(result.getResponse().getContentAsString());
                     ResponseLoginDto responseBody = objectMapper.readValue(result.getResponse().getContentAsString(StandardCharsets.UTF_8), ResponseLoginDto.class);
-                    assertThat(responseBody.getCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
+                    assertThat(responseBody.getCode()).isEqualTo(HttpStatus.CONFLICT.value());
                 });
     }
 

@@ -53,7 +53,7 @@ public class UserExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ResponseErrorDto.builder()
                         .errorCode(HttpStatus.BAD_REQUEST.value())
-                        .errorMessage(e.getMessage())
+                        .errorMessage(e.getBindingResult().getAllErrors().get(0).getDefaultMessage())
                         .build());
     }
 

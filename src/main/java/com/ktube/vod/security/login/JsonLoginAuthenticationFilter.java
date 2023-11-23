@@ -1,6 +1,7 @@
 package com.ktube.vod.security.login;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ktube.vod.user.UserSecurityLevel;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.Set;
 
 public class JsonLoginAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
@@ -35,7 +37,7 @@ public class JsonLoginAuthenticationFilter extends UsernamePasswordAuthenticatio
         }
         //세션 정보가 이미 존재하는 경우
         if(SecurityContextHolder.getContext().getAuthentication() != null) {
-            writeResponse((HttpServletResponse) response, HttpStatus.FORBIDDEN.value(), "이미 세션을 갖고 있는 클라이언트 입니다.");
+            writeResponse((HttpServletResponse) response, HttpStatus.CONFLICT.value(), "이미 세션을 갖고 있는 클라이언트 입니다.");
             return;
         }
         super.doFilter(request, response, chain);
@@ -49,13 +51,33 @@ public class JsonLoginAuthenticationFilter extends UsernamePasswordAuthenticatio
         }
         RequestLoginDto requestBody = extractRequestLoginDto(request); /* requestBody로 부터 데이터 파싱 */
 
+        boolean temporary = requestBody.isTemporary();
+        String clientDeviceInfo = requestBody.getClientDeviceInfo();
         String username = requestBody.getEmail();
         String password = requestBody.getPassword();
-        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username, password);
 
+        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username, password);
         setDetails(request, authRequest);
 
-        return getAuthenticationManager().authenticate(authRequest);
+        Authentication authentication =  getAuthenticationManager().authenticate(authRequest);
+        KTubeUserDetails userDetails = (KTubeUserDetails) authentication.getPrincipal();
+
+        if(temporary || userDetails.getSecurityLevel().getCode() >= UserSecurityLevel.IDENTITY.getCode()) {
+            //본인 인증하도록 시도
+
+            //로직 넣어야함
+
+            throw new NotYetAuthorizedException("본인 인증을 해야합니다.");
+        }
+        // 허용된 디바이스인지 확인
+        Set<String> devices = userDetails.getDevices();
+        for(String deviceInfo : clientDeviceInfo.split(" ")) {
+            if(!devices.contains(deviceInfo)) {
+                continue;
+            }
+            return authentication;
+        }
+        throw new NotAllowedDeviceException("등록되지 않은 디바이스에서 접속했습니다.");
     }
 
     private void writeResponse(HttpServletResponse response, int code, String message) throws IOException {
