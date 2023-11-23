@@ -1,6 +1,8 @@
 package com.ktube.vod.user;
 
+import com.ktube.vod.identification.IdentificationFailureException;
 import com.ktube.vod.identification.IdentificationService;
+import com.ktube.vod.notification.NotificationFailureException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -30,7 +32,7 @@ public class UserService {
      * @return 임시 가입된 유저 데이터
      */
     @Transactional
-    public KTubeUser join(RequestUserJoinDto requestBody) {
+    public KTubeUser join(RequestUserJoinDto requestBody) throws NotificationFailureException {
 
         String email = requestBody.getEmail();
         String password = PasswordEncoderUtils.encodePassword(requestBody.getPassword());
@@ -52,7 +54,7 @@ public class UserService {
      * @param identificationCode 인증 시도를 위한 코드
      */
     @Transactional
-    public KTubeUser identifyUser(String identificationCode) {
+    public KTubeUser identifyUser(String identificationCode) throws IdentificationFailureException {
 
         KTubeUser user = identificationService.identify(identificationCode);
 

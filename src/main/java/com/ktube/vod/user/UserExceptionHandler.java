@@ -2,6 +2,7 @@ package com.ktube.vod.user;
 
 import com.ktube.vod.error.ResponseErrorDto;
 import com.ktube.vod.identification.IdentificationFailureException;
+import com.ktube.vod.notification.NotificationFailureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -66,6 +67,19 @@ public class UserExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ResponseErrorDto.builder()
                         .errorCode(HttpStatus.BAD_REQUEST.value())
+                        .errorMessage(e.getMessage())
+                        .build());
+    }
+
+    @ExceptionHandler({NotificationFailureException.class})
+    public ResponseEntity<ResponseErrorDto> handleNotificationFailureException(NotificationFailureException e) {
+
+        log.info(e.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ResponseErrorDto.builder()
+                        .errorCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
                         .errorMessage(e.getMessage())
                         .build());
     }

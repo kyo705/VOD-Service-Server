@@ -8,4 +8,6 @@ public interface IdentificationService {
     String createIdentification(KTubeUser user) throws NotificationFailureException;
 
     KTubeUser identify(String identificationCode) throws IdentificationFailureException;
+
+    String createIdentificationMessage(String identificationCode);
 }

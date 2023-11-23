@@ -55,7 +55,8 @@ public class JwtIdentificationService implements IdentificationService {
             requireNonNull(response).setHeader(HttpHeaders.AUTHORIZATION, jwt);
 
             // 인증번호로 이메일 메세지 생성 후 이메일 전송
-            notificationService.send(user.getEmail(), identificationCode);
+            String message = createIdentificationMessage(identificationCode);
+            notificationService.send(user.getEmail(), message);
 
             return jwt;
         } catch (JsonProcessingException e) {
@@ -89,5 +90,11 @@ public class JwtIdentificationService implements IdentificationService {
         } catch (JWTVerificationException e) {
             throw new IdentificationFailureException(e.getMessage());
         }
+    }
+
+    @Override
+    public String createIdentificationMessage(String identificationCode) {
+
+        return String.format("인증 번호 : %s", identificationCode);
     }
 }
