@@ -7,7 +7,7 @@ CREATE TABLE ktube_user (
     email VARCHAR(50) NOT NULL,
     password VARCHAR(255) NOT NULL,
     nickname VARCHAR(15) NOT NULL,
-    role SMALLINT NOT NULL,
+    grade SMALLINT NOT NULL,
     security_level SMALLINT NOT NULL
 );
 

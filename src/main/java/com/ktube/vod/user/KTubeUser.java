@@ -27,11 +27,11 @@ public class KTubeUser {
     @NotNull
     private String nickname;
 
-    @Convert(converter = UserRoleConverter.class)
+    @Convert(converter = UserGradeDatabaseConverter.class)
     @NotNull
-    private UserRole role;
+    private UserGrade grade;
 
-    @Convert(converter = UserSecurityLevelConverter.class)
+    @Convert(converter = UserSecurityLevelDatabaseConverter.class)
     @NotNull
     private UserSecurityLevel securityLevel;
 
@@ -44,7 +44,7 @@ public class KTubeUser {
         KTubeUser.setEmail(email);
         KTubeUser.setPassword(password);
         KTubeUser.setNickname(nickname);
-        KTubeUser.setRole(UserRole.GENERAL);
+        KTubeUser.setGrade(UserGrade.GENERAL);
         KTubeUser.setSecurityLevel(UserSecurityLevel.GENERAL);
 
         return KTubeUser;

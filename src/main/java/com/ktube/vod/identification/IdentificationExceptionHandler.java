@@ -1,9 +1,7 @@
-package com.ktube.vod.user;
+package com.ktube.vod.identification;
 
 import com.ktube.vod.error.ResponseErrorDto;
-import com.ktube.vod.notification.NotificationFailureException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +13,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
-@RestControllerAdvice(assignableTypes = UserController.class)
-public class UserExceptionHandler {
+@RestControllerAdvice(assignableTypes = IdentificationController.class)
+public class IdentificationExceptionHandler {
 
     // request body 데이터가 없을 때
     @ExceptionHandler({HttpMessageNotReadableException.class})
@@ -45,20 +43,7 @@ public class UserExceptionHandler {
                         .build());
     }
 
-    @ExceptionHandler({IllegalAccessException.class})
-    public ResponseEntity<ResponseErrorDto> handleIllegalAccessException(IllegalAccessException e) {
-
-        log.info(e.getMessage());
-
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ResponseErrorDto.builder()
-                        .errorCode(HttpStatus.BAD_REQUEST.value())
-                        .errorMessage(e.getMessage())
-                        .build());
-    }
-
-    // modelAttribute @valid 예외 처리
+    // modelAttribute 에서 @valid 검증 실패시
     @ExceptionHandler({BindException.class})
     public ResponseEntity<ResponseErrorDto> handleConstraintViolationException(BindException e) {
 
@@ -73,6 +58,7 @@ public class UserExceptionHandler {
                         .build());
     }
 
+    // request body 에서 @valid 검증 실패시
     @ExceptionHandler({MethodArgumentNotValidException.class})
     public ResponseEntity<ResponseErrorDto> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
 
@@ -87,6 +73,7 @@ public class UserExceptionHandler {
                         .build());
     }
 
+    //requestParam 에서 예외 발생시
     @ExceptionHandler({MissingServletRequestParameterException.class})
     public ResponseEntity<ResponseErrorDto> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
 
@@ -100,8 +87,8 @@ public class UserExceptionHandler {
                         .build());
     }
 
-    @ExceptionHandler(ConversionFailedException.class)
-    public ResponseEntity<ResponseErrorDto> handleConversionFailedException(ConversionFailedException e) {
+    @ExceptionHandler({IdentificationFailureException.class})
+    public ResponseEntity<ResponseErrorDto> handleIdentificationFailureException(IdentificationFailureException e) {
 
         log.info(e.getMessage());
 
@@ -109,19 +96,6 @@ public class UserExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ResponseErrorDto.builder()
                         .errorCode(HttpStatus.BAD_REQUEST.value())
-                        .errorMessage(e.getMessage())
-                        .build());
-    }
-
-    @ExceptionHandler({NotificationFailureException.class})
-    public ResponseEntity<ResponseErrorDto> handleNotificationFailureException(NotificationFailureException e) {
-
-        log.info(e.getMessage());
-
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ResponseErrorDto.builder()
-                        .errorCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
                         .errorMessage(e.getMessage())
                         .build());
     }
@@ -143,12 +117,12 @@ public class UserExceptionHandler {
     @ExceptionHandler({Exception.class})
     public ResponseEntity<ResponseErrorDto> handleAnyException(Exception e) {
 
-        System.out.println(e.getClass());
+        System.out.println(e.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ResponseErrorDto.builder()
-                        .errorCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                        .errorCode(HttpStatus.BAD_REQUEST.value())
                         .errorMessage(e.getMessage())
                         .build());
     }

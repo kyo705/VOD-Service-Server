@@ -1,13 +1,10 @@
 package com.ktube.vod.identification;
 
 import com.ktube.vod.notification.NotificationFailureException;
-import com.ktube.vod.user.KTubeUser;
 
 public interface IdentificationService {
 
-    String createIdentification(KTubeUser user) throws NotificationFailureException;
+    String createIdentification(String destination, Object data) throws NotificationFailureException;
 
-    KTubeUser identify(String identificationCode) throws IdentificationFailureException;
-
-    String createIdentificationMessage(String identificationCode);
+    Object identify(String identificationCode) throws IdentificationFailureException;
 }

@@ -44,15 +44,11 @@ public class UserService {
         KTubeUser user = KTubeUser.init(email, password, nickname);
 
         // 인증 생성
-        identificationService.createIdentification(user);
+        identificationService.createIdentification(email, user);
 
         return user;
     }
 
-    /**
-     * 인증 번호로 인증 처리가 성공하면 해당 계정을 생성한다.
-     * @param identificationCode 인증 시도를 위한 코드
-     */
     @Transactional
     public KTubeUser identifyUser(String identificationCode) throws IdentificationFailureException {
 

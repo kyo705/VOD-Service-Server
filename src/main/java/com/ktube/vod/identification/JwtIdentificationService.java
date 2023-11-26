@@ -6,7 +6,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ktube.vod.notification.NotificationFailureException;
 import com.ktube.vod.notification.NotificationService;
-import com.ktube.vod.user.KTubeUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.ktube.vod.identification.IdentificationConstants.*;
+import static com.ktube.vod.notification.NotificationConstants.IDENTIFICATION_EMAIL_SUBJECT;
 import static java.util.Objects.requireNonNull;
 
 @Slf4j
@@ -35,7 +35,7 @@ public class JwtIdentificationService implements IdentificationService {
     private final NotificationService notificationService;
 
     @Override
-    public String createIdentification(KTubeUser user) throws NotificationFailureException {
+    public String createIdentification(String destination, Object data) throws NotificationFailureException {
 
         ServletRequestAttributes attributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
         HttpServletResponse response = requireNonNull(attributes).getResponse();
@@ -46,7 +46,7 @@ public class JwtIdentificationService implements IdentificationService {
         // 인증 번호를 secret key로 jwt 생성
         try {
             Map<String, String> claims = new HashMap<>();
-            claims.put(JWT_IDENTIFICATION_USER_CLAIM, objectMapper.writeValueAsString(user));
+            claims.put(JWT_IDENTIFICATION_USER_CLAIM, objectMapper.writeValueAsString(data));
 
             String jwt = JwtUtils.create(identificationCode, JWT_IDENTIFICATION_SUBJECT,
                             JWT_IDENTIFICATION_EXPIRATION_MS, claims);
@@ -56,7 +56,7 @@ public class JwtIdentificationService implements IdentificationService {
 
             // 인증번호로 이메일 메세지 생성 후 이메일 전송
             String message = createIdentificationMessage(identificationCode);
-            notificationService.send(user.getEmail(), message);
+            notificationService.send(destination, IDENTIFICATION_EMAIL_SUBJECT, message);
 
             return jwt;
         } catch (JsonProcessingException e) {
@@ -65,7 +65,7 @@ public class JwtIdentificationService implements IdentificationService {
     }
 
     @Override
-    public KTubeUser identify(String identificationCode) throws IdentificationFailureException {
+    public Object identify(String identificationCode) throws IdentificationFailureException {
 
         ServletRequestAttributes attributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = requireNonNull(attributes).getRequest();
@@ -84,16 +84,13 @@ public class JwtIdentificationService implements IdentificationService {
             }
             String user = JwtUtils.getClaim(decodedJWT, JWT_IDENTIFICATION_USER_CLAIM);
 
-            return objectMapper.readValue(user, KTubeUser.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            return user;
         } catch (JWTVerificationException e) {
             throw new IdentificationFailureException(e.getMessage());
         }
     }
 
-    @Override
-    public String createIdentificationMessage(String identificationCode) {
+    private String createIdentificationMessage(String identificationCode) {
 
         return String.format("인증 번호 : %s", identificationCode);
     }

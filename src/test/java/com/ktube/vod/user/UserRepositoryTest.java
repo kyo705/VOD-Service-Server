@@ -69,7 +69,7 @@ public class UserRepositoryTest {
         user.setEmail("email@naver.com");
         user.setPassword("123456789!d");
         user.setNickname("hi");
-        user.setRole(UserRole.TEMPORARY);
+        user.setGrade(UserGrade.TEMPORARY);
 
         //when
         KTubeUser resultUser = userRepository.findById(user.getId());
@@ -79,7 +79,7 @@ public class UserRepositoryTest {
         assertThat(resultUser.getEmail()).isEqualTo(user.getEmail());
         assertThat(PasswordEncoderUtils.match(user.getPassword(),resultUser.getPassword())).isTrue();
         assertThat(resultUser.getNickname()).isEqualTo(user.getNickname());
-        assertThat(resultUser.getRole()).isEqualTo(user.getRole());
+        assertThat(resultUser.getGrade()).isEqualTo(user.getGrade());
     }
 
     @DisplayName("존재하지 않는 유저 id로 조회할 경우 null을 리턴한다.")
@@ -106,7 +106,7 @@ public class UserRepositoryTest {
         user.setEmail("email@naver.com");
         user.setPassword("123456789!d");
         user.setNickname("hi");
-        user.setRole(UserRole.TEMPORARY);
+        user.setGrade(UserGrade.TEMPORARY);
 
         //when
         KTubeUser resultUser = userRepository.findByEmail(user.getEmail());
@@ -116,7 +116,7 @@ public class UserRepositoryTest {
         assertThat(resultUser.getEmail()).isEqualTo(user.getEmail());
         assertThat(PasswordEncoderUtils.match(user.getPassword(),resultUser.getPassword())).isTrue();
         assertThat(resultUser.getNickname()).isEqualTo(user.getNickname());
-        assertThat(resultUser.getRole()).isEqualTo(user.getRole());
+        assertThat(resultUser.getGrade()).isEqualTo(user.getGrade());
     }
 
     @DisplayName("존재하지 않는 유저 이메일로 조회할 경우 null을 리턴한다.")

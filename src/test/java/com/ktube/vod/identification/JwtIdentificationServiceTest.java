@@ -56,7 +56,7 @@ public class JwtIdentificationServiceTest {
         KTubeUser user = KTubeUser.init("email@naver.com", "password1#", "닉네임");
 
         //when
-        String resultJwt = jwtIdentificationService.createIdentification(user);
+        String resultJwt = jwtIdentificationService.createIdentification(user.getEmail(), user);
 
         //then
         String expectedJwt = response.getHeader(HttpHeaders.AUTHORIZATION);
@@ -77,10 +77,10 @@ public class JwtIdentificationServiceTest {
         KTubeUser user = KTubeUser.init("email@naver.com", "password1#", "닉네임");
 
         willThrow(NotificationFailureException.class)
-                .given(mockNotificationService).send(ArgumentMatchers.any(), ArgumentMatchers.any());
+                .given(mockNotificationService).send(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any());
 
         //when & then
-        assertThrows(NotificationFailureException.class, () -> jwtIdentificationService.createIdentification(user));
+        assertThrows(NotificationFailureException.class, () -> jwtIdentificationService.createIdentification(user.getEmail(), user));
     }
 
     @DisplayName("올바른 인증 번호로 인증을 시도할 경우 해당 유저 데이터가 리턴된다.")
@@ -103,16 +103,17 @@ public class JwtIdentificationServiceTest {
         RequestContextHolder.setRequestAttributes(requestAttributes);
 
         //when
-        KTubeUser resultUser = jwtIdentificationService.identify(identificationCode);
+        String userData = (String) jwtIdentificationService.identify(identificationCode);
+        KTubeUser resultUser = objectMapper.readValue(userData, KTubeUser.class);
 
         //then
         assertThat(resultUser.getEmail()).isEqualTo(user.getEmail());
         assertThat(resultUser.getNickname()).isEqualTo(user.getNickname());
-        assertThat(resultUser.getRole()).isEqualTo(user.getRole());
+        assertThat(resultUser.getGrade()).isEqualTo(user.getGrade());
         assertThat(resultUser.getPassword()).isEqualTo(user.getPassword());
     }
 
-    @DisplayName("기간 만료된 jwt로 인증을 시도할 경우 예외가 발생한다.")
+    @DisplayName("잘못된 인증번호로 인증을 시도할 경우 예외가 발생한다.")
     @Test
     public void testIdentifyWithInvalidIdentificationCode() throws JsonProcessingException {
 
@@ -182,7 +183,7 @@ public class JwtIdentificationServiceTest {
         assertThrows(IdentificationFailureException.class, ()-> jwtIdentificationService.identify(identificationCode));
     }
 
-    @DisplayName("본인 인증 jwt가 아닌 토큰으로 인증을 시도할 경우 예외가 발생한다.")
+    @DisplayName("요청 헤더에 본인 인증 jwt가 없을 경우 예외가 발생한다.")
     @Test
     public void testIdentifyWithNotExistingJWT() {
 

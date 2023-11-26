@@ -1,7 +1,8 @@
 package com.ktube.vod.security.login;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ktube.vod.user.UserSecurityLevel;
+import com.ktube.vod.identification.IdentificationService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,9 +23,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Set;
 
-public class JsonLoginAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+import static com.ktube.vod.user.UserSecurityLevel.IDENTITY;
+
+@RequiredArgsConstructor
+public class KTubeLoginAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final IdentificationService identificationService;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -62,20 +67,29 @@ public class JsonLoginAuthenticationFilter extends UsernamePasswordAuthenticatio
         Authentication authentication =  getAuthenticationManager().authenticate(authRequest);
         KTubeUserDetails userDetails = (KTubeUserDetails) authentication.getPrincipal();
 
-        if(temporary || userDetails.getSecurityLevel().getCode() >= UserSecurityLevel.IDENTITY.getCode()) {
-            //본인 인증하도록 시도
+        checkRequiredIdentify(temporary, userDetails);
+        checkAllowedDevice(clientDeviceInfo, userDetails.getDevices());
 
-            //로직 넣어야함
+        return authentication;
+    }
 
-            throw new NotYetAuthorizedException("본인 인증을 해야합니다.");
+    private void checkRequiredIdentify(boolean temporary, KTubeUserDetails userDetails) {
+
+        if(!temporary && userDetails.getSecurityLevel().getCode() < IDENTITY.getCode()) {
+            return;
         }
-        // 허용된 디바이스인지 확인
-        Set<String> devices = userDetails.getDevices();
-        for(String deviceInfo : clientDeviceInfo.split(" ")) {
-            if(!devices.contains(deviceInfo)) {
-                continue;
+        userDetails.setPassword(null);
+        identificationService.createIdentification(userDetails.getEmail(), userDetails);
+
+        throw new NotYetAuthorizedException("본인 인증을 해야합니다.");
+    }
+
+    private void checkAllowedDevice(String requestDevices, Set<String> allowedDevices) {
+
+        for(String deviceInfo : requestDevices.split(" ")) {
+            if(allowedDevices.contains(deviceInfo)) {
+                return;
             }
-            return authentication;
         }
         throw new NotAllowedDeviceException("등록되지 않은 디바이스에서 접속했습니다.");
     }

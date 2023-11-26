@@ -20,11 +20,10 @@ public class EmailNotificationService implements NotificationService {
 
     @Async("threadPoolTaskExecutor")
     @Override
-    public void send(String destination, String message) {
-
-        String subject = NotificationConstants.IDENTIFICATION_EMAIL_SUBJECT;
+    public void send(String destination, String subject, String message) {
 
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+        simpleMailMessage.setFrom(NotificationConstants.IDENTIFICATION_EMAIL_SENDER);
         simpleMailMessage.setTo(destination);
         simpleMailMessage.setSubject(subject);
         simpleMailMessage.setText(message);
@@ -34,6 +33,7 @@ public class EmailNotificationService implements NotificationService {
             log.info("메일 전송");
         }
         catch (MailException e) {
+            log.error(e.getMessage());
             throw new NotificationFailureException();
         }
     }

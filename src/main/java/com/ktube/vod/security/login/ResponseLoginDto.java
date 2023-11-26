@@ -1,10 +1,13 @@
 package com.ktube.vod.security.login;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ResponseLoginDto {
 
     private int code;

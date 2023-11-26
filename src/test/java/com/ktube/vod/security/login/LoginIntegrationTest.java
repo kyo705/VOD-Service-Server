@@ -79,7 +79,7 @@ public class LoginIntegrationTest {
                 });
     }
 
-    @DisplayName("인증이 완료되지 않은 유저로 로그인 시도할 경우 401 상태코드를 리턴한다.")
+    @DisplayName("인증이 완료되지 않은 유저로 로그인 시도할 경우 403 상태코드를 리턴한다.")
     @MethodSource("com.ktube.vod.security.login.LoginSetup#getLoginDtoWithUserRequiredToIdentity")
     @ParameterizedTest
     public void testLoginWithUserInfoRequiredToIdentity(RequestLoginDto requestBody) throws Exception {
