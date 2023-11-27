@@ -1,20 +1,20 @@
 package com.ktube.vod.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ktube.vod.identification.IdentificationFailureException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -24,7 +24,10 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
 @ActiveProfiles("test")
@@ -46,6 +49,55 @@ public class UserControllerTest {
                 .addFilters(new CharacterEncodingFilter("UTF-8", true))
                 .build();
     }
+
+    // --------------------- FIND CURRENT USER --------------------------
+
+    @WithUserDetails("email@naver.com")
+    @DisplayName("올바른 파라미터로 회원가입 요청 시 200 상태코드를 리턴한다.")
+    @Test
+    public void testFindCurrentUserWithValidParam() throws Exception {
+
+        //given
+        KTubeUser user = new KTubeUser();
+        given(mockUserService.find(anyLong())).willReturn(user);
+
+        //when & then
+        mockMvc.perform(
+                        MockMvcRequestBuilders
+                                .get(UserConstants.USER_URL)
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                )
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                ;
+
+        verify(mockUserService, times(1)).find(1);
+
+    }
+
+
+    @DisplayName("올바른 파라미터로 회원가입 요청 시 200 상태코드를 리턴한다.")
+    @Test
+    public void testFindCurrentUserWithNoSession() throws Exception {
+
+        //given
+        KTubeUser user = new KTubeUser();
+        given(mockUserService.find(anyLong())).willReturn(user);
+
+        //when & then
+        mockMvc.perform(
+                        MockMvcRequestBuilders
+                                .get(UserConstants.USER_URL)
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                )
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+        ;
+
+        verify(mockUserService, times(0)).find(1);
+
+    }
+
+
+    // --------------------- JOIN --------------------------
 
     @DisplayName("올바른 파라미터로 회원가입 요청 시 200 상태코드를 리턴한다.")
     @Test
@@ -211,76 +263,143 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").value(HttpStatus.BAD_REQUEST.value()));
     }
 
+    // --------------------- UPDATE --------------------------
 
-    @DisplayName("올바른 인증 번호로 본인 인증 요청시 200 상태코드를 리턴한다.")
-    @Test
-    public void testIdentifyWithValidParam() throws Exception {
+    @WithUserDetails("email@naver.com")
+    @DisplayName("올바른 파라미터들로 유저 업데이트 요청시 204 상태코드를 리턴한다.")
+    @MethodSource("com.ktube.vod.user.UserSetup#getValidUserUpdateParam")
+    @ParameterizedTest
+    public void testUpdateWithValidParam(String password, String nickname,
+                                            int securityLevelCode, int userGradeCode) throws Exception {
 
         //given
-        KTubeUser user = KTubeUser.init("email@naver.com", "1234567890asg", "테스트");
-        given(mockUserService.identifyUser(any())).willReturn(user);
+        KTubeUser user = new KTubeUser();
+        user.setId(1L);
+        user.setEmail("email@naver.com");
+        user.setPassword(password);
+        user.setNickname(nickname);
+        user.setGrade(UserGrade.valueOfCode(userGradeCode));
+        user.setSecurityLevel(UserSecurityLevel.valueOfCode(securityLevelCode));
+
+        given(mockUserService.update(anyLong(), any())).willReturn(user);
 
         //when & then
         mockMvc.perform(
                         MockMvcRequestBuilders
-                                .get(UserConstants.USER_IDENTIFICATION_URL)
-                                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                .param("identificationCode", "12345678")
+                                .patch(UserConstants.SPECIFIC_USER_URL, 1)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .param("password", password)
+                                .param("nickname", nickname)
+                                .param("securityLevel", Integer.toString(securityLevelCode))
+                                .param("grade", Integer.toString(userGradeCode))
                 )
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(user.getId()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.email").value(user.getEmail()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.nickname").value(user.getNickname()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.userRole").value(user.getRole().name()));
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 
-    @DisplayName("인증 번호 없이 본인 인증 요청시 400 상태코드를 리턴한다.")
+
+    @DisplayName("세션이 존재하지 않을 때 유저 정보로 접근할 경우 403 예외가 발생한다.")
     @Test
-    public void testIdentifyWithoutParam() throws Exception {
+    public void testUpdateWithNoSession() throws Exception {
 
         //when & then
         mockMvc.perform(
                         MockMvcRequestBuilders
-                                .get(UserConstants.USER_IDENTIFICATION_URL)
-                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .patch(UserConstants.SPECIFIC_USER_URL, 1)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .param("nickname", "updatedTT")
+                )
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
+    }
+
+    @WithUserDetails("email@naver.com")
+    @DisplayName("현재 세션과 일치하지 않는 유저 정보로 접근할 경우 400 예외가 발생한다.")
+    @Test
+    public void testUpdateWithInvalidParam() throws Exception {
+
+        //when & then
+        mockMvc.perform(
+                        MockMvcRequestBuilders
+                                .patch(UserConstants.SPECIFIC_USER_URL, 2)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .param("nickname", "updatedTT")
+                )
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+
+    @WithUserDetails("email@naver.com")
+    @DisplayName("잘못된 파라미터들로 유저 업데이트 요청시 400 예외가 발생한다.")
+    @MethodSource("com.ktube.vod.user.UserSetup#getInvalidUserUpdateParam")
+    @ParameterizedTest
+    public void testUpdateWithInvalidParam2(String password, String nickname,
+                                            int securityLevelCode, int userGradeCode) throws Exception {
+
+        //given
+
+        //when & then
+        mockMvc.perform(
+                        MockMvcRequestBuilders
+                                .patch(UserConstants.SPECIFIC_USER_URL, 1)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .param("password", password)
+                                .param("nickname", nickname)
+                                .param("securityLevel", Integer.toString(securityLevelCode))
+                                .param("grade", Integer.toString(userGradeCode))
+                )
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+
+    // --------------------- DELETE --------------------------
+
+
+    @WithUserDetails("email@naver.com")
+    @DisplayName("올바른 파라미터들로 계정 탈퇴 요청시 200 상태코드를 리턴한다.")
+    @Test
+    public void testDeleteWithValidParam() throws Exception {
+
+        //given
+
+        //when & then
+        mockMvc.perform(
+                        MockMvcRequestBuilders
+                                .delete(UserConstants.SPECIFIC_USER_URL, 1)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andExpect(SecurityMockMvcResultMatchers.unauthenticated())
+        ;
+    }
+
+    @DisplayName("세션이 없을 때 유저 정보로 접근할 경우 403 예외가 발생한다.")
+    @Test
+    public void testDeleteWithNoSession() throws Exception {
+
+        //when & then
+        mockMvc.perform(
+                        MockMvcRequestBuilders
+                                .delete(UserConstants.SPECIFIC_USER_URL, 1)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(SecurityMockMvcResultMatchers.unauthenticated())
+        ;
+    }
+
+    @WithUserDetails("email@naver.com")
+    @DisplayName("현재 세션과 일치하지 않는 유저 정보로 접근할 경우 400 예외가 발생한다.")
+    @Test
+    public void testDeleteWithInvalidParam() throws Exception {
+
+        //when & then
+        mockMvc.perform(
+                        MockMvcRequestBuilders
+                                .delete(UserConstants.SPECIFIC_USER_URL, 2)
+                                .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").value(HttpStatus.BAD_REQUEST.value()));
+                .andExpect(SecurityMockMvcResultMatchers.authenticated())
+        ;
     }
 
-    @DisplayName("잘못된 인증 번호로 본인 인증 요청시 400 상태코드를 리턴한다.")
-    @Test
-    public void testIdentifyWithInvalidParam() throws Exception {
-
-        //given
-        given(mockUserService.identifyUser(any())).willThrow(IdentificationFailureException.class);
-
-        //when & then
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .get(UserConstants.USER_IDENTIFICATION_URL)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .param("identificationCode", "12345678")
-                )
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").value(HttpStatus.BAD_REQUEST.value()));
-    }
-
-    @DisplayName("이미 인증된 사용자가 해당 요청에 대해 다시 본인 인증 요청시 409 상태코드를 리턴한다.")
-    @Test
-    public void testIdentifyWithAlreadyIdentifiedUser() throws Exception {
-
-        //given
-        given(mockUserService.identifyUser(any())).willThrow(DataIntegrityViolationException.class);
-
-        //when & then
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .get(UserConstants.USER_IDENTIFICATION_URL)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .param("identificationCode", "12345678")
-                )
-                .andExpect(MockMvcResultMatchers.status().isConflict())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").value(HttpStatus.CONFLICT.value()));
-    }
 }

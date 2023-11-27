@@ -2,7 +2,7 @@ package com.ktube.vod.user;
 
 import javax.persistence.AttributeConverter;
 
-public class UserSecurityLevelConverter implements AttributeConverter<UserSecurityLevel, Integer> {
+public class UserSecurityLevelDatabaseConverter implements AttributeConverter<UserSecurityLevel, Integer> {
 
     @Override
     public Integer convertToDatabaseColumn(UserSecurityLevel attribute) {

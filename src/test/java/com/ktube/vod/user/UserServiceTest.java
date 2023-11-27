@@ -49,7 +49,7 @@ public class UserServiceTest {
         assertThat(resultKTubeUser.getEmail()).isEqualTo(request.getEmail());
         assertThat(PasswordEncoderUtils.match(request.getPassword(), resultKTubeUser.getPassword())).isTrue();
         assertThat(resultKTubeUser.getNickname()).isEqualTo(request.getNickname());
-        assertThat(resultKTubeUser.getGrade()).isEqualTo(UserGrade.TEMPORARY);
+        assertThat(resultKTubeUser.getGrade()).isEqualTo(UserGrade.GENERAL);
     }
 
     @DisplayName("이미 존재하는 이메일로 회원가입 요청시 예외가 발생한다.")

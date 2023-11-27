@@ -55,4 +55,24 @@ public class KTubeUser {
         UserDevice userDevice = UserDevice.init(this, clientDeviceInfo);
         devices.add(userDevice);
     }
+
+    public void changePassword(String password) {
+
+        this.password = PasswordEncoderUtils.encodePassword(password);
+    }
+
+    public void changeNickname(String nickname) {
+
+        this.nickname = nickname;
+    }
+
+    public void changeSecurityLevel(UserSecurityLevel securityLevel) {
+
+        this.securityLevel = securityLevel;
+    }
+
+    public void changeGrade(UserGrade userGrade) {
+
+        this.grade = userGrade;
+    }
 }

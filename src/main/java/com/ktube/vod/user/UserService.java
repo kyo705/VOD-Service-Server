@@ -1,6 +1,5 @@
 package com.ktube.vod.user;
 
-import com.ktube.vod.identification.IdentificationFailureException;
 import com.ktube.vod.identification.IdentificationService;
 import com.ktube.vod.notification.NotificationFailureException;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +18,31 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    @Transactional
+    public void create(KTubeUser user) {
+
+        userRepository.create(user);
+    }
+
+    @Transactional(readOnly = true)
+    public KTubeUser find(long userId) {
+
+        return userRepository.findById(userId);
+    }
 
     @Transactional
+    public KTubeUser update(long userId, RequestUserUpdateDto requestParam) {
+
+        return userRepository.update(userId, requestParam);
+    }
+
+    @Transactional
+    public void delete(long userId) {
+
+        userRepository.delete(userId);
+    }
+
+    @Transactional(readOnly = true)
     public boolean isExistingUser(String email) {
 
         return userRepository.findByEmail(email) != null;
@@ -49,13 +71,4 @@ public class UserService {
         return user;
     }
 
-    @Transactional
-    public KTubeUser identifyUser(String identificationCode) throws IdentificationFailureException {
-
-        KTubeUser user = identificationService.identify(identificationCode);
-
-        userRepository.create(user);
-
-        return user;
-    }
 }

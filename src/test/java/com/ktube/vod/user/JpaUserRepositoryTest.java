@@ -1,22 +1,25 @@
 package com.ktube.vod.user;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional(readOnly = true)
-public class UserRepositoryTest {
+public class JpaUserRepositoryTest {
 
     @Autowired
     private UserRepository userRepository;
@@ -131,5 +134,106 @@ public class UserRepositoryTest {
 
         //then
         assertThat(resultUser).isNull();
+    }
+
+    @DisplayName("기존 이메일에 해당하는 데이터가 없을 경우 유저 데이터를 저장한다.")
+    @Test
+    public void testCreateUserWithNotExistingUser() {
+
+        //given
+        String email = "notExistingUser@naver.com";
+        KTubeUser user = KTubeUser.init(email, "1234567!@sdg", "test");
+
+        assertThat(userRepository.findByEmail(email)).isNull();
+
+        //when
+        userRepository.create(user);
+
+        //then
+        assertThat(userRepository.findByEmail(email)).isNotNull();
+
+    }
+
+    @DisplayName("이미 존재하는 이메일로 계정 생성시 예외가 발생한다.")
+    @Test
+    public void testCreateUserWithAlreadyExistingUser() {
+
+        //given
+        String email = "email@naver.com";
+        KTubeUser user = KTubeUser.init(email, "1234567!@sdg", "test");
+
+
+        //when & then
+        Assertions.assertThrows(DataIntegrityViolationException.class,
+                () -> userRepository.create(user));
+    }
+
+
+    @DisplayName("존재하는 계정에 대해 업데이트 요청시 업데이트가 실행된다.")
+    @Test
+    public void testUpdateUserWithExistingUser() {
+
+        //given
+        String email = "email@naver.com";
+        String updatedNickname = "updatedNickname";
+        KTubeUser user = userRepository.findByEmail(email);
+
+        RequestUserUpdateDto param = new RequestUserUpdateDto();
+        param.setNickname(updatedNickname);
+
+        //when
+        KTubeUser updatedUser = userRepository.update(user.getId(), param);
+
+        //then
+        assertThat(updatedUser.getNickname()).isEqualTo(updatedNickname);
+
+        assertThat(updatedUser.getEmail()).isEqualTo(user.getEmail());
+        assertThat(updatedUser.getPassword()).isEqualTo(user.getPassword());
+        assertThat(updatedUser.getGrade()).isEqualTo(user.getGrade());
+        assertThat(updatedUser.getSecurityLevel()).isEqualTo(user.getSecurityLevel());
+    }
+
+    @DisplayName("존재하는 계정에 대해 업데이트 요청시 업데이트가 실행된다.")
+    @Test
+    public void testUpdateUserWithNotExistingUser() {
+
+        //given
+        RequestUserUpdateDto param = new RequestUserUpdateDto();
+        param.setNickname("updatedNickname");
+
+        //when & then
+        Assertions.assertThrows(InvalidDataAccessApiUsageException.class,
+                ()->userRepository.update(151L, param));
+    }
+
+    @DisplayName("존재하는 유저로 계정 삭제 요청시 삭제된다.")
+    @Test
+    public void testDeleteUserWithExistingUser() {
+
+        //given
+        Long userId = 1L;
+        KTubeUser user = em.find(KTubeUser.class, userId);
+        assertThat(user).isNotNull();
+
+        //when
+        userRepository.delete(userId);
+
+        //then
+        KTubeUser deletedUser = em.find(KTubeUser.class, userId);
+        assertThat(deletedUser).isNull();
+    }
+
+    @DisplayName("존재하는 유저로 계정 삭제 요청시 삭제된다.")
+    @Test
+    public void testDeleteUserWithNotExistingUser() {
+
+        //given
+        Long userId = 131L;
+        KTubeUser user = em.find(KTubeUser.class, userId);
+        assertThat(user).isNull();
+
+        //when & then
+        Assertions.assertThrows(InvalidDataAccessApiUsageException.class,
+                ()->userRepository.delete(userId));
     }
 }

@@ -45,12 +45,37 @@ public class JpaUserRepository implements UserRepository {
     }
 
     @Override
-    public KTubeUser update(KTubeUser user) {
-        return null;
+    public KTubeUser update(long userId, RequestUserUpdateDto requestParam) {
+
+        KTubeUser user = em.find(KTubeUser.class, userId);
+        if(user == null) {
+            throw new IllegalArgumentException("존재하지 않는 유저입니다.");
+        }
+
+        if(requestParam.getPassword() != null) {
+            user.changePassword(requestParam.getPassword());
+        }
+        if(requestParam.getNickname() != null) {
+            user.changeNickname(requestParam.getNickname());
+        }
+        if(requestParam.getSecurityLevel() != null) {
+            user.changeSecurityLevel(requestParam.getSecurityLevel());
+        }
+        if(requestParam.getGrade() != null) {
+            user.changeGrade(requestParam.getGrade());
+        }
+        return user;
     }
 
     @Override
     public KTubeUser delete(Long id) {
-        return null;
+
+        KTubeUser user = em.find(KTubeUser.class, id);
+        if(user == null) {
+            throw new IllegalArgumentException("존재하지 않는 유저입니다.");
+        }
+        em.remove(user);
+
+        return user;
     }
 }
