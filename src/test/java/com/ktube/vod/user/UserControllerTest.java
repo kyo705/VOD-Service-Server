@@ -1,6 +1,7 @@
 package com.ktube.vod.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ktube.vod.user.log.UserLogService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,7 @@ public class UserControllerTest {
     private WebApplicationContext context;
     private MockMvc mockMvc;
     @MockBean private UserService mockUserService;
+    @MockBean private UserLogService userLogService;
 
     @BeforeEach
     public void setup(){
@@ -402,4 +404,76 @@ public class UserControllerTest {
         ;
     }
 
+
+    // --------------------- FIND USER CONNECT LOGS ------------------------
+
+
+    @WithUserDetails("email@naver.com")
+    @DisplayName("유저 로그 조회 : 올바른 파라미터로 요청시 200 상태코드를 리턴한다.")
+    @Test
+    public void testFindUserConnectLogsWithValidParam() throws Exception {
+
+        //given
+        long userId = 1L;
+        int offset = 0;
+        int size = 20;
+        given(userLogService.findByUserId(userId, offset, size)).willReturn(UserSetup.getUserLogs(userId));
+
+        //when & then
+        mockMvc.perform(
+                        MockMvcRequestBuilders
+                                .get(UserConstants.USER_CONNECT_LOG_URL, userId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .param("offset", Integer.toString(offset))
+                                .param("size", Integer.toString(size))
+                )
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(SecurityMockMvcResultMatchers.authenticated())
+        ;
+    }
+
+
+    @DisplayName("유저 로그 조회 : 세션이 없을 경우 예외가 발생한다.")
+    @Test
+    public void testFindUserConnectLogsWithNoSession() throws Exception {
+
+        //given
+        long userId = 1L;
+        int offset = 0;
+        int size = 20;
+
+        //when & then
+        mockMvc.perform(
+                        MockMvcRequestBuilders
+                                .get(UserConstants.USER_CONNECT_LOG_URL, userId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .param("offset", Integer.toString(offset))
+                                .param("size", Integer.toString(size))
+                )
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(SecurityMockMvcResultMatchers.unauthenticated())
+        ;
+    }
+
+    @WithUserDetails("email@naver.com")
+    @DisplayName("유저 로그 조회 : 잘못된 파라미터로 요청시 400 상태코드를 리턴한다.")
+    @MethodSource("com.ktube.vod.user.UserSetup#getInvalidParamWithFindUserConnectLogs")
+    @ParameterizedTest
+    public void testFindUserConnectLogsWithInvalidParam(long userId, int offset, int size) throws Exception {
+
+        //given
+        given(userLogService.findByUserId(userId, offset, size)).willReturn(UserSetup.getUserLogs(userId));
+
+        //when & then
+        mockMvc.perform(
+                        MockMvcRequestBuilders
+                                .get(UserConstants.USER_CONNECT_LOG_URL, userId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .param("offset", Integer.toString(offset))
+                                .param("size", Integer.toString(size))
+                )
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(SecurityMockMvcResultMatchers.authenticated())
+        ;
+    }
 }

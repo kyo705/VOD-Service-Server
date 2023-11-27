@@ -1,22 +1,29 @@
 package com.ktube.vod.user;
 
 import com.ktube.vod.security.login.KTubeUserDetails;
+import com.ktube.vod.user.log.ResponseUserLogDto;
+import com.ktube.vod.user.log.UserLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.PositiveOrZero;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import static com.ktube.vod.user.UserConstants.SPECIFIC_USER_URL;
-import static com.ktube.vod.user.UserConstants.USER_URL;
+import static com.ktube.vod.user.UserConstants.*;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
+    private final UserLogService userLogService;
 
     @GetMapping(USER_URL)
     public ResponseUserDto findCurrentUser() throws IllegalAccessException {
@@ -64,6 +71,20 @@ public class UserController {
         userService.delete(userId);
 
         SecurityContextHolder.clearContext();
+    }
+
+    @GetMapping(USER_CONNECT_LOG_URL)
+    public List<ResponseUserLogDto> findUserConnectLogs(@PathVariable Long userId,
+                                                        @RequestParam @PositiveOrZero int offset,
+                                                        @RequestParam @PositiveOrZero int size
+    ) throws IllegalAccessException {
+
+        validate(userId);
+
+        return userLogService.findByUserId(userId, offset, size)
+                .stream()
+                .map(ResponseUserLogDto::new)
+                .collect(Collectors.toList());
     }
 
     private void validate(long userId) throws IllegalAccessException {

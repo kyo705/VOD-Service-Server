@@ -14,6 +14,8 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.validation.ConstraintViolationException;
+
 @Slf4j
 @RestControllerAdvice(assignableTypes = UserController.class)
 public class UserExceptionHandler {
@@ -140,13 +142,28 @@ public class UserExceptionHandler {
     }
 
 
+    // requestParam 검증 실패시
+    @ExceptionHandler({ConstraintViolationException.class})
+    public ResponseEntity<ResponseErrorDto> handleConstraintViolationException(ConstraintViolationException e) {
+
+        log.info(e.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ResponseErrorDto.builder()
+                        .errorCode(HttpStatus.BAD_REQUEST.value())
+                        .errorMessage(e.getMessage())
+                        .build());
+    }
+
+
     @ExceptionHandler({Exception.class})
     public ResponseEntity<ResponseErrorDto> handleAnyException(Exception e) {
 
         System.out.println(e.getClass());
 
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ResponseErrorDto.builder()
                         .errorCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
                         .errorMessage(e.getMessage())

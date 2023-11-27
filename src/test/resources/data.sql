@@ -13,3 +13,11 @@ VALUES (1, 2, 'Mozilla/1'),
         (6, 3, 'AppleWebKit/2'),
         (7, 3, 'Chrome/3'),
         (8, 3, 'Safari/4');
+
+INSERT INTO user_log (id, user_id, connect_ip, connect_device, connect_type, connect_timestamp)
+VALUES (1, 1, '127.0.0.1', 'device1', 0, 10000000),
+        (2, 1, '59.2.1.5', 'device2', 0, 10000003),
+        (3, 1, '131.52.1.33', 'device3', 0, 10000050),
+        (4, 1, '59.2.1.5', 'device2', 1, 10000060),
+        (5, 1, '127.0.0.1', 'device1', 1, 10007000),
+        (6, 1, '131.52.1.33', 'device3', 1, 11000000);

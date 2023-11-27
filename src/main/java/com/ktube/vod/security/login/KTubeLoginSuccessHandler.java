@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,6 +21,7 @@ import static com.ktube.vod.notification.NotificationConstants.LOGIN_ALARM_SUBJE
 
 
 @Slf4j
+@Component
 @RequiredArgsConstructor
 public class KTubeLoginSuccessHandler implements AuthenticationSuccessHandler {
 
@@ -36,6 +38,7 @@ public class KTubeLoginSuccessHandler implements AuthenticationSuccessHandler {
 
             notificationService.send(userDetails.getEmail(), LOGIN_ALARM_SUBJECT, loginMessage);
         }
+
         writeResponse(response, HttpStatus.OK.value(), "로그인 성공");
     }
 

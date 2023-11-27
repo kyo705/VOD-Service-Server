@@ -7,7 +7,7 @@ public class UserConstants {
     public static final String NICKNAME_REGEX = "[ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z\\d\\s]{1,20}$";
     public static final String USER_URL = "/api/user";
     public static final String SPECIFIC_USER_URL = "/api/user/{userId}";
-    public static final String USER_IDENTIFICATION_URL = "/api/user/identification";
+    public static final String USER_CONNECT_LOG_URL = "/api/user/{userId}/connect-log";
 
     // 메세지
     public static final String ALREADY_EXISTING_EMAIL_MESSAGE = "이미 존재하는 이메일 계정입니다.";
