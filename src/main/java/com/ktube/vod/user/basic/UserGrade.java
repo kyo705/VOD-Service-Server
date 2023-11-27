@@ -29,6 +29,11 @@ public enum UserGrade {
 
     public static UserGrade valueOfCode(int code) {
 
-        return USER_ROLE_MAP.get(code);
+        UserGrade grade = USER_ROLE_MAP.get(code);
+
+        if(grade == null) {
+            throw new IllegalArgumentException("존재하지 않는 등급 입니다.");
+        }
+        return grade;
     }
 }

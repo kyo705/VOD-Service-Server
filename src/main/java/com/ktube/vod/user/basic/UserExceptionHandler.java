@@ -24,7 +24,7 @@ public class UserExceptionHandler {
     @ExceptionHandler({HttpMessageNotReadableException.class})
     public ResponseEntity<ResponseErrorDto> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
 
-        log.info(e.getMessage());
+        log.info("HttpMessageNotReadableException : " + e.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
@@ -37,7 +37,7 @@ public class UserExceptionHandler {
     @ExceptionHandler({IllegalArgumentException.class})
     public ResponseEntity<ResponseErrorDto> handleIllegalArgumentException(IllegalArgumentException e) {
 
-        log.info(e.getMessage());
+        log.info("IllegalArgumentException : " + e.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
@@ -50,7 +50,7 @@ public class UserExceptionHandler {
     @ExceptionHandler({IllegalAccessException.class})
     public ResponseEntity<ResponseErrorDto> handleIllegalAccessException(IllegalAccessException e) {
 
-        log.info(e.getMessage());
+        log.info("IllegalAccessException : " + e.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
@@ -65,7 +65,7 @@ public class UserExceptionHandler {
     public ResponseEntity<ResponseErrorDto> handleConstraintViolationException(BindException e) {
 
         String errorMessage = e.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
-        log.info(errorMessage);
+        log.info("BindException : " + errorMessage);
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
@@ -79,7 +79,7 @@ public class UserExceptionHandler {
     public ResponseEntity<ResponseErrorDto> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
 
         String errorMessage = e.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
-        log.info(errorMessage);
+        log.info("MethodArgumentNotValidException : " + errorMessage);
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
@@ -92,7 +92,7 @@ public class UserExceptionHandler {
     @ExceptionHandler({MissingServletRequestParameterException.class})
     public ResponseEntity<ResponseErrorDto> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
 
-        log.info(e.getMessage());
+        log.info("MissingServletRequestParameterException : " + e.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
@@ -105,20 +105,20 @@ public class UserExceptionHandler {
     @ExceptionHandler(ConversionFailedException.class)
     public ResponseEntity<ResponseErrorDto> handleConversionFailedException(ConversionFailedException e) {
 
-        log.info(e.getMessage());
+        log.info("ConversionFailedException : " + e.getCause().getCause().getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ResponseErrorDto.builder()
                         .errorCode(HttpStatus.BAD_REQUEST.value())
-                        .errorMessage(e.getMessage())
+                        .errorMessage(e.getCause().getMessage())
                         .build());
     }
 
     @ExceptionHandler({NotificationFailureException.class})
     public ResponseEntity<ResponseErrorDto> handleNotificationFailureException(NotificationFailureException e) {
 
-        log.info(e.getMessage());
+        log.info("NotificationFailureException : " + e.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -131,7 +131,7 @@ public class UserExceptionHandler {
     @ExceptionHandler({DataIntegrityViolationException.class})
     public ResponseEntity<ResponseErrorDto> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
 
-        log.info(e.getMessage());
+        log.info("DataIntegrityViolationException : " + e.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
@@ -146,7 +146,7 @@ public class UserExceptionHandler {
     @ExceptionHandler({ConstraintViolationException.class})
     public ResponseEntity<ResponseErrorDto> handleConstraintViolationException(ConstraintViolationException e) {
 
-        log.info(e.getMessage());
+        log.info("ConstraintViolationException : " + e.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
@@ -160,7 +160,7 @@ public class UserExceptionHandler {
     @ExceptionHandler({Exception.class})
     public ResponseEntity<ResponseErrorDto> handleAnyException(Exception e) {
 
-        System.out.println(e.getClass());
+        log.error(e.getClass() + " : " + e.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)

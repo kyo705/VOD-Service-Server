@@ -29,6 +29,10 @@ public enum UserSecurityLevel {
 
     public static UserSecurityLevel valueOfCode(int code) {
 
-        return USER_SECURITY_LEVEL_MAP.get(code);
+        UserSecurityLevel securityLevel = USER_SECURITY_LEVEL_MAP.get(code);
+        if(securityLevel == null) {
+            throw new IllegalArgumentException("존재하지 않는 유저 보안 레벨입니다.");
+        }
+        return securityLevel;
     }
 }
