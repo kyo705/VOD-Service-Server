@@ -1,8 +1,5 @@
-package com.ktube.vod.user.log;
+package com.ktube.vod.user.basic;
 
-import com.ktube.vod.user.KTubeUser;
-import com.ktube.vod.user.RequestUserUpdateDto;
-import com.ktube.vod.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

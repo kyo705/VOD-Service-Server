@@ -26,7 +26,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Set;
 
-import static com.ktube.vod.user.UserSecurityLevel.IDENTITY;
+import static com.ktube.vod.user.basic.UserSecurityLevel.IDENTITY;
 
 @RequiredArgsConstructor
 public class KTubeLoginAuthenticationFilter extends UsernamePasswordAuthenticationFilter {

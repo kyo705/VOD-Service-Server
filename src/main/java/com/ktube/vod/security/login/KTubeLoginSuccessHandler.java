@@ -2,7 +2,7 @@ package com.ktube.vod.security.login;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ktube.vod.notification.NotificationService;
-import com.ktube.vod.user.UserSecurityLevel;
+import com.ktube.vod.user.basic.UserSecurityLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;

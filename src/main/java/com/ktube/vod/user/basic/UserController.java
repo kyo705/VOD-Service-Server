@@ -1,4 +1,4 @@
-package com.ktube.vod.user;
+package com.ktube.vod.user.basic;
 
 import com.ktube.vod.security.login.KTubeUserDetails;
 import com.ktube.vod.user.log.ResponseUserLogDto;
@@ -15,7 +15,7 @@ import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.ktube.vod.user.UserConstants.*;
+import static com.ktube.vod.user.basic.UserConstants.*;
 
 @Validated
 @RestController

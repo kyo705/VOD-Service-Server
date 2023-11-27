@@ -1,4 +1,4 @@
-package com.ktube.vod.user;
+package com.ktube.vod.user.basic;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;

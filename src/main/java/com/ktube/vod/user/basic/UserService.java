@@ -1,4 +1,4 @@
-package com.ktube.vod.user;
+package com.ktube.vod.user.basic;
 
 import com.ktube.vod.identification.IdentificationService;
 import com.ktube.vod.notification.NotificationFailureException;
@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.ktube.vod.user.UserConstants.ALREADY_EXISTING_EMAIL_MESSAGE;
+import static com.ktube.vod.user.basic.UserConstants.ALREADY_EXISTING_EMAIL_MESSAGE;
 
 @Service
 @RequiredArgsConstructor

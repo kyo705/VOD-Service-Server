@@ -1,9 +1,9 @@
 package com.ktube.vod.security.login;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ktube.vod.user.KTubeUser;
-import com.ktube.vod.user.UserDevice;
-import com.ktube.vod.user.UserSecurityLevel;
+import com.ktube.vod.user.basic.KTubeUser;
+import com.ktube.vod.user.basic.UserDevice;
+import com.ktube.vod.user.basic.UserSecurityLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

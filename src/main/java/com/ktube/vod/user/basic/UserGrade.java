@@ -1,4 +1,4 @@
-package com.ktube.vod.user;
+package com.ktube.vod.user.basic;
 
 import lombok.Getter;
 

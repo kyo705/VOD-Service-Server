@@ -2,8 +2,8 @@ package com.ktube.vod.identification;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ktube.vod.security.login.KTubeUserDetails;
-import com.ktube.vod.user.KTubeUser;
-import com.ktube.vod.user.UserService;
+import com.ktube.vod.user.basic.KTubeUser;
+import com.ktube.vod.user.basic.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

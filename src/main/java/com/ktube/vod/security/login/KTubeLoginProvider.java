@@ -1,6 +1,6 @@
 package com.ktube.vod.security.login;
 
-import com.ktube.vod.user.PasswordEncoderUtils;
+import com.ktube.vod.user.basic.PasswordEncoderUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.*;

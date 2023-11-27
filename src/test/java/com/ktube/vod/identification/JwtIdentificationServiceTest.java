@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ktube.vod.notification.NotificationFailureException;
 import com.ktube.vod.notification.NotificationService;
-import com.ktube.vod.user.KTubeUser;
+import com.ktube.vod.user.basic.KTubeUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

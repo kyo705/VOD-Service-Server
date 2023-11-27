@@ -1,6 +1,6 @@
 package com.ktube.vod.config;
 
-import com.ktube.vod.user.UserConstants;
+import com.ktube.vod.user.basic.UserConstants;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;

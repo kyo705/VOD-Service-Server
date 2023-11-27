@@ -1,4 +1,4 @@
-package com.ktube.vod.user;
+package com.ktube.vod.user.basic;
 
 import javax.validation.Constraint;
 import java.lang.annotation.ElementType;
@@ -8,10 +8,10 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = PasswordValidator.class)
-public @interface Password {
+@Constraint(validatedBy = NicknameValidator.class)
+public @interface Nickname {
 
-    String message() default "password must contain special character and number and character at least once";
+    String message() default "nickname must not contains special characters except with space";
     Class[] groups() default {};
     Class[] payload() default {};
 }

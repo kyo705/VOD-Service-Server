@@ -4,7 +4,7 @@ import com.ktube.vod.identification.IdentificationService;
 import com.ktube.vod.security.authority.JsonAccessDeniedHandler;
 import com.ktube.vod.security.authority.JsonHttp403ForbiddenEntryPoint;
 import com.ktube.vod.security.login.KTubeLoginConfigurer;
-import com.ktube.vod.user.UserGrade;
+import com.ktube.vod.user.basic.UserGrade;
 import com.ktube.vod.user.log.UserLogService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +25,7 @@ import static com.ktube.vod.identification.IdentificationConstants.IDENTIFICATIO
 import static com.ktube.vod.identification.IdentificationConstants.IDENTIFICATION_LOGIN_URL;
 import static com.ktube.vod.security.SecurityConstants.LOGIN_URL;
 import static com.ktube.vod.security.SecurityConstants.LOGOUT_URL;
-import static com.ktube.vod.user.UserConstants.*;
+import static com.ktube.vod.user.basic.UserConstants.*;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 
