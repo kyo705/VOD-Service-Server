@@ -2,9 +2,6 @@ package com.ktube.vod.security.login;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ktube.vod.identification.IdentificationService;
-import com.ktube.vod.user.log.RequestUserLogCreateDto;
-import com.ktube.vod.user.log.UserConnectType;
-import com.ktube.vod.user.log.UserLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -33,7 +30,7 @@ public class KTubeLoginAuthenticationFilter extends UsernamePasswordAuthenticati
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final IdentificationService identificationService;
-    private final UserLogService userLogService;
+
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -70,11 +67,11 @@ public class KTubeLoginAuthenticationFilter extends UsernamePasswordAuthenticati
 
         Authentication authentication =  getAuthenticationManager().authenticate(authRequest);
         KTubeUserDetails userDetails = (KTubeUserDetails) authentication.getPrincipal();
+        userDetails.setConnectDevice(clientDeviceInfo);
+        userDetails.setConnectIp(request.getRemoteAddr());
 
         checkRequiredIdentify(temporary, userDetails);
         checkAllowedDevice(clientDeviceInfo, userDetails.getDevices());
-        createUserLoginLog(userDetails.getUserId(), request.getRemoteAddr(), clientDeviceInfo);
-
 
         return authentication;
     }
@@ -90,25 +87,11 @@ public class KTubeLoginAuthenticationFilter extends UsernamePasswordAuthenticati
         throw new NotYetAuthorizedException("본인 인증을 해야합니다.");
     }
 
-    private void checkAllowedDevice(String requestDevices, Set<String> allowedDevices) {
+    private void checkAllowedDevice(String requestDevice, Set<String> allowedDevices) {
 
-        for(String deviceInfo : requestDevices.split(" ")) {
-            if(allowedDevices.contains(deviceInfo)) {
-                return;
-            }
+        if(!allowedDevices.contains(requestDevice)) {
+            throw new NotAllowedDeviceException("등록되지 않은 디바이스에서 접속했습니다.");
         }
-        throw new NotAllowedDeviceException("등록되지 않은 디바이스에서 접속했습니다.");
-    }
-
-    private void createUserLoginLog(long userId, String connectIp, String connectDevice) {
-
-        RequestUserLogCreateDto param = new RequestUserLogCreateDto();
-        param.setUserId(userId);
-        param.setConnectIp(connectIp);
-        param.setConnectDevice(connectDevice);
-        param.setConnectType(UserConnectType.LOGIN);
-
-        userLogService.create(param);
     }
 
     private void writeResponse(HttpServletResponse response, int code, String message) throws IOException {

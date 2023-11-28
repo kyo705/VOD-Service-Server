@@ -24,6 +24,8 @@ public class KTubeUserDetails implements UserDetails {
     private List<KTubeGrantedAuthority> authorities;
     private UserSecurityLevel securityLevel;
     private Set<String> devices;
+    private String connectIp;
+    private String connectDevice;
 
     public KTubeUserDetails(KTubeUser user) {
 

@@ -1,9 +1,6 @@
-package com.ktube.vod.user;
+package com.ktube.vod.user.log;
 
 
-import com.ktube.vod.user.log.JpaUserLogRepository;
-import com.ktube.vod.user.log.UserConnectType;
-import com.ktube.vod.user.log.UserLog;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

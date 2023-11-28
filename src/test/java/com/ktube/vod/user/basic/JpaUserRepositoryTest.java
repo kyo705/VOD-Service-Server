@@ -1,6 +1,5 @@
-package com.ktube.vod.user;
+package com.ktube.vod.user.basic;
 
-import com.ktube.vod.user.basic.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

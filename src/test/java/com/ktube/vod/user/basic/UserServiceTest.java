@@ -1,8 +1,7 @@
-package com.ktube.vod.user;
+package com.ktube.vod.user.basic;
 
 import com.ktube.vod.identification.IdentificationService;
 import com.ktube.vod.notification.NotificationFailureException;
-import com.ktube.vod.user.basic.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

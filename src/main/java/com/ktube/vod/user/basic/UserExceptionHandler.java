@@ -2,6 +2,7 @@ package com.ktube.vod.user.basic;
 
 import com.ktube.vod.error.ResponseErrorDto;
 import com.ktube.vod.notification.NotificationFailureException;
+import com.ktube.vod.user.session.UserSessionController;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import javax.validation.ConstraintViolationException;
 
 @Slf4j
-@RestControllerAdvice(assignableTypes = UserController.class)
+@RestControllerAdvice(assignableTypes = {UserController.class, UserSessionController.class})
 public class UserExceptionHandler {
 
     // request body 데이터가 없을 때

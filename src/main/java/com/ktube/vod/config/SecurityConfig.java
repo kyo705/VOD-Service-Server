@@ -5,7 +5,6 @@ import com.ktube.vod.security.authority.JsonAccessDeniedHandler;
 import com.ktube.vod.security.authority.JsonHttp403ForbiddenEntryPoint;
 import com.ktube.vod.security.login.KTubeLoginConfigurer;
 import com.ktube.vod.user.basic.UserGrade;
-import com.ktube.vod.user.log.UserLogService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -26,6 +25,8 @@ import static com.ktube.vod.identification.IdentificationConstants.IDENTIFICATIO
 import static com.ktube.vod.security.SecurityConstants.LOGIN_URL;
 import static com.ktube.vod.security.SecurityConstants.LOGOUT_URL;
 import static com.ktube.vod.user.basic.UserConstants.*;
+import static com.ktube.vod.user.session.UserSessionConstants.SPECIFIC_USER_SESSION_URL;
+import static com.ktube.vod.user.session.UserSessionConstants.USER_SESSION_URL;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 
@@ -42,17 +43,20 @@ public class SecurityConfig {
                                            AuthenticationFailureHandler loginFailureHandler,
                                            LogoutSuccessHandler logoutSuccessHandler,
                                            @Qualifier("jwtIdentificationService")
-                                           IdentificationService identificationService,
-                                           UserLogService userLogService
+                                           IdentificationService identificationService
     ) throws Exception {
 
 
         //엔드 포인트 권한 설정
         http.authorizeHttpRequests()
-                .antMatchers(POST, USER_URL).hasAnyAuthority("ROLE_ANONYMOUS")
-                .antMatchers(GET, IDENTIFICATION_JOIN_URL, IDENTIFICATION_LOGIN_URL).hasAnyAuthority("ROLE_ANONYMOUS")
-                .antMatchers(GET, USER_URL, USER_CONNECT_LOG_URL).hasAnyAuthority(UserGrade.TEMPORARY.name(), UserGrade.GENERAL.name(), UserGrade.PREMIUM.name())
-                .antMatchers(SPECIFIC_USER_URL).hasAnyAuthority(UserGrade.TEMPORARY.name(), UserGrade.GENERAL.name(), UserGrade.PREMIUM.name())
+                .antMatchers(POST, USER_URL)
+                    .hasAnyAuthority("ROLE_ANONYMOUS")
+                .antMatchers(GET, IDENTIFICATION_JOIN_URL, IDENTIFICATION_LOGIN_URL)
+                    .hasAnyAuthority("ROLE_ANONYMOUS")
+                .antMatchers(GET, USER_URL, USER_CONNECT_LOG_URL)
+                    .hasAnyAuthority(UserGrade.TEMPORARY.name(), UserGrade.GENERAL.name(), UserGrade.PREMIUM.name())
+                .antMatchers(SPECIFIC_USER_URL, SPECIFIC_USER_SESSION_URL, USER_SESSION_URL)
+                    .hasAnyAuthority(UserGrade.TEMPORARY.name(), UserGrade.GENERAL.name(), UserGrade.PREMIUM.name())
 
         ;
 
@@ -62,7 +66,7 @@ public class SecurityConfig {
                 .authenticationEntryPoint(new JsonHttp403ForbiddenEntryPoint());
 
         //로그인 설정
-        http.apply(new KTubeLoginConfigurer<>(identificationService, userLogService))
+        http.apply(new KTubeLoginConfigurer<>(identificationService))
                 .loginProcessingUrl(LOGIN_URL)
                 .successHandler(loginSuccessHandler)
                 .failureHandler(loginFailureHandler);
